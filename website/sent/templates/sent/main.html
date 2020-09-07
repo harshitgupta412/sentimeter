@@ -1,0 +1,92 @@
+{% load static %}
+
+<!Doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
+        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+        <link href='https://fonts.googleapis.com/css?family=Sofia' rel='stylesheet'>
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+        <link rel="stylesheet" href="{% static 'sent/style.css' %}">
+        <title>
+            Sentdex
+        </title>
+    </head>
+
+    <body>
+
+        <div class="heading text-center">
+            <h1 class="head">Sentdex</h1>
+        </div>
+        <div class="key-container">
+            <div class="keys">
+            {%for d in data%}
+                <form method = 'POST'>
+                {% csrf_token %}
+                <div class="card" onClick = showChart({{d.key.pk}})>
+                    <span class="col-md-4 key"> {{d.key.keyword}} </span>
+                    <span class="col-md-4 sent text-center" data-cur="{{d.sent.overall}}" data-prev="{{d.last.overall}}"></span>
+                    <span class="col-md-4 vol text-right" data-cur="{{d.sent.v_overall}}" data-prev="{{d.last.v_overall}}"></span>
+                </div>
+                </form>
+                <div class = "graph col-md-12" id="{{d.key.keyword}}">
+                <div class="graph-item" id="{{d.key.keyword}}-overall"></div>
+                <div class="graph-item" id="{{d.key.keyword}}-news"></div>
+                <div class="graph-item" id="{{d.key.keyword}}-reddit"></div>
+                <div class="graph-item" id="{{d.key.keyword}}-twitter"></div>
+
+                </div> 
+            {%endfor%}
+            </div>
+        </div>
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+      <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script src="{% static 'sent/chart.js' %}"></script>   
+        <script src="{% static 'sent/diff.js' %}"></script>   
+        <script>
+        function showChart(id) {
+            console.log(id);
+            var url = "{%url 'fetchgraph' %}"
+            var data = new FormData()
+            data.append("id", id);
+            data.append("csrfmiddlewaretoken", '{{ csrf_token }}');
+            $.ajax({
+                url: url,
+                data: data,
+                type: 'post',
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+                    console.log(data.reddit);
+                    Array.from(document.getElementsByClassName("graph")).forEach(function(element) {
+                        element.style.opacity = '0';
+                        element.style.height = '0px';
+                    });
+                    if(getComputedStyle(document.getElementById(data.key)).opacity=='0') {
+                        document.getElementById(data.key).style.opacity = '1';
+                        document.getElementById(data.key).style.height = '1700px';
+                        plotgraph(data.key+'(Overall)', data.overall,data.v_over, data.key+'-overall');
+                        plotgraph(data.key+'(Twitter)', data.twitter,data.v_twit, data.key+'-twitter');
+                        plotgraph(data.key+'(Reddit)', data.reddit,data.v_reddit, data.key+'-reddit');
+                        plotgraph(data.key+'(News)', data.news,data.v_news, data.key+'-news');
+                    }
+                },
+                error: function() {
+                    alert("Something went wrong. We are trying to fix it.");
+                }
+            })
+        }
+        </script>
+    </body>
+</html>
