@@ -1,0 +1,11 @@
+GetOldTweets3         
+pandas                 
+gspread                
+oauth2client           
+newspaper3k           
+langdetect             
+psaw                
+praw                   
+numpy                  
+nltk               
+schedule      
