@@ -6,7 +6,7 @@ The final_data.py is a scheduler script that fetches the data from the websites 
 
 The data is stored in a google spreadsheet including the volume(number of data entries fetched) and the average sentiment for each of the sources and keys. This allows easy analysis of the data using charts and maps. 
 
-The website folder contains the code for the site used to visualise the data using graphs. This is a django website and can easily be run using the command: `python manage.py runserver` in the same folder. A demo version is available at: http://sentimeter.pythonanywhere.com/(may be down by the time you see this).
+The website folder contains the code for the site used to visualise the data using graphs. This is a django website and can easily be run using the command: `python manage.py runserver` in the same folder. A demo version is available at [this link](http://sentimeter.pythonanywhere.com/) (may be down by the time you see this).
 
 
 ![](./images/list.png)
